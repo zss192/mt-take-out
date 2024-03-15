@@ -1,11 +1,13 @@
 package com.sky.controller.admin;
 
+import com.sky.dto.SetmealDTO;
 import com.sky.dto.SetmealPageQueryDTO;
 import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.SetmealService;
 import com.sky.vo.SetmealVO;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.ibatis.annotations.Update;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -49,6 +51,17 @@ public class SetmealController {
     @PostMapping("/status/{status}")
     public Result status(@PathVariable Integer status,Long id){
         setmealService.startOrStop(status,id);
+        return Result.success();
+    }
+
+    /**
+     * 新增套餐
+     * @param setmealDTO
+     * @return
+     */
+    @PostMapping
+    public Result add(@RequestBody SetmealDTO setmealDTO){
+        setmealService.add(setmealDTO);
         return Result.success();
     }
 }
