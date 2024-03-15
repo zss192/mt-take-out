@@ -1,5 +1,6 @@
 package com.sky.service.impl;
 
+import com.github.pagehelper.Constant;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.sky.constant.MessageConstant;
@@ -49,7 +50,7 @@ public class SetmealServiceImpl implements SetmealService {
     @Override
     public SetmealVO getById(Long id) {
         // 根据id查询套餐
-        SetmealVO setmealVO = setmealDishMapper.getById(id);
+        SetmealVO setmealVO = setmealMapper.getById(id);
         // 根据id查询套餐对应的菜品
         List<SetmealDish> setmealDishes = setmealDishMapper.getBySetmealId(id);
         setmealVO.setSetmealDishes(setmealDishes);
@@ -138,5 +139,29 @@ public class SetmealServiceImpl implements SetmealService {
             });
             setmealDishMapper.insertBatch(setmealDishes);
         }
+    }
+
+    /**
+     * 批量删除套餐
+     *
+     * @param ids
+     * @return
+     */
+    @Override
+    @Transactional
+    public void deleteBacth(List<Long> ids) {
+        // 如果套餐是在售状态，则不可删除
+        for (Long id : ids) {
+            SetmealVO setmealVO = setmealMapper.getById(id);
+            if(setmealVO.getStatus().equals(StatusConstant.ENABLE)){
+                throw new DeletionNotAllowedException(MessageConstant.SETMEAL_ON_SALE);
+            }
+        }
+        // 删除套餐菜品表的信息
+        for (Long id : ids) {
+            setmealDishMapper.deleteBySetmealId(id);
+        }
+        // 删除套餐表的信息
+        setmealMapper.deleteByIds(ids);
     }
 }

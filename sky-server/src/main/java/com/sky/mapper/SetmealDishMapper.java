@@ -21,13 +21,6 @@ public interface SetmealDishMapper {
     List<Long> getSetmealIdsByDishIds(List<Long> ids);
 
     /**
-     * 根据id查询套餐
-     * @param id
-     * @return
-     */
-    SetmealVO getById(Long id);
-
-    /**
      * 根据套餐id查询对应的菜品
      * @param setmealId
      * @return
@@ -41,6 +34,10 @@ public interface SetmealDishMapper {
      */
     void insertBatch(List<SetmealDish> setmealDishes);
 
+    /**
+     * 根据套餐id删除对应的菜品
+     * @param setmealId
+     */
     @Delete("delete from setmeal_dish where setmeal_id = #{setmealId}")
     void deleteBySetmealId(Long setmealId);
 }
