@@ -35,4 +35,11 @@ public interface SetmealService {
      * @return
      */
     void add(SetmealDTO setmealDTO);
+
+    /**
+     * 修改套餐
+     * @param setmealDTO
+     * @return
+     */
+    void update(SetmealDTO setmealDTO);
 }
