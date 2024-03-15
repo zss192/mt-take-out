@@ -13,6 +13,7 @@ import com.sky.entity.DishFlavor;
 import com.sky.entity.Setmeal;
 import com.sky.entity.SetmealDish;
 import com.sky.exception.DeletionNotAllowedException;
+import com.sky.exception.SetmealEnableFailedException;
 import com.sky.mapper.CategoryMapper;
 import com.sky.mapper.DishMapper;
 import com.sky.mapper.SetmealDishMapper;
@@ -79,12 +80,14 @@ public class SetmealServiceImpl implements SetmealService {
      */
     @Override
     public void startOrStop(Integer status, Long id) {
-        // 如果套餐内有停售菜品，则不可起售
-        List<SetmealDish> setmealDishes = setmealDishMapper.getBySetmealId(id);
-        for (SetmealDish setmealDish : setmealDishes) {
-            Dish dish = dishMapper.getById(setmealDish.getDishId());
-            if (dish != null && dish.getStatus().equals(StatusConstant.DISABLE)) {
-                throw new DeletionNotAllowedException(MessageConstant.SETMEAL_ENABLE_FAILED);
+        // 如果想起售但套餐内有停售菜品，则不可起售
+        if(status.equals(StatusConstant.ENABLE)){
+            List<SetmealDish> setmealDishes = setmealDishMapper.getBySetmealId(id);
+            for (SetmealDish setmealDish : setmealDishes) {
+                Dish dish = dishMapper.getById(setmealDish.getDishId());
+                if (dish != null && dish.getStatus().equals(StatusConstant.DISABLE)) {
+                    throw new SetmealEnableFailedException(MessageConstant.SETMEAL_ENABLE_FAILED);
+                }
             }
         }
         setmealMapper.startOrStop(status, id);

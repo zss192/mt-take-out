@@ -25,7 +25,7 @@ public class SetmealController {
     @Autowired
     private SetmealService setmealService;
     /**
-     * 根据id查询菜品
+     * 根据id查询套餐
      * @param id
      * @return
      */
