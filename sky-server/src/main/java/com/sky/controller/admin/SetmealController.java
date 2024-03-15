@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/admin/setmeal")
 @Slf4j
-public class SetmealDishController {
+public class SetmealController {
     @Autowired
     private SetmealService setmealService;
     /**
@@ -38,5 +38,17 @@ public class SetmealDishController {
     public Result<PageResult> page(SetmealPageQueryDTO setmealPageQueryDTO){
         PageResult pageResult = setmealService.pageQuery(setmealPageQueryDTO);
         return Result.success(pageResult);
+    }
+
+    /**
+     * 套餐起售、停售
+     * @param status
+     * @param id
+     * @return
+     */
+    @PostMapping("/status/{status}")
+    public Result status(@PathVariable Integer status,Long id){
+        setmealService.startOrStop(status,id);
+        return Result.success();
     }
 }
