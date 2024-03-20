@@ -1,15 +1,12 @@
 package com.sky.service.impl;
 
-import com.github.pagehelper.Constant;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.sky.constant.MessageConstant;
 import com.sky.constant.StatusConstant;
-import com.sky.dto.CategoryDTO;
 import com.sky.dto.SetmealDTO;
 import com.sky.dto.SetmealPageQueryDTO;
 import com.sky.entity.Dish;
-import com.sky.entity.DishFlavor;
 import com.sky.entity.Setmeal;
 import com.sky.entity.SetmealDish;
 import com.sky.exception.DeletionNotAllowedException;
@@ -20,7 +17,7 @@ import com.sky.mapper.SetmealDishMapper;
 import com.sky.mapper.SetmealMapper;
 import com.sky.result.PageResult;
 import com.sky.service.SetmealService;
-import com.sky.vo.DishVO;
+import com.sky.vo.DishItemVO;
 import com.sky.vo.SetmealVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -81,7 +78,7 @@ public class SetmealServiceImpl implements SetmealService {
     @Override
     public void startOrStop(Integer status, Long id) {
         // 如果想起售但套餐内有停售菜品，则不可起售
-        if(status.equals(StatusConstant.ENABLE)){
+        if (status.equals(StatusConstant.ENABLE)) {
             List<SetmealDish> setmealDishes = setmealDishMapper.getBySetmealId(id);
             for (SetmealDish setmealDish : setmealDishes) {
                 Dish dish = dishMapper.getById(setmealDish.getDishId());
@@ -156,7 +153,7 @@ public class SetmealServiceImpl implements SetmealService {
         // 如果套餐是在售状态，则不可删除
         for (Long id : ids) {
             SetmealVO setmealVO = setmealMapper.getById(id);
-            if(setmealVO.getStatus().equals(StatusConstant.ENABLE)){
+            if (setmealVO.getStatus().equals(StatusConstant.ENABLE)) {
                 throw new DeletionNotAllowedException(MessageConstant.SETMEAL_ON_SALE);
             }
         }
@@ -166,5 +163,25 @@ public class SetmealServiceImpl implements SetmealService {
         }
         // 删除套餐表的信息
         setmealMapper.deleteByIds(ids);
+    }
+
+    /**
+     * 条件查询
+     *
+     * @param setmeal
+     * @return
+     */
+    public List<Setmeal> list(Setmeal setmeal) {
+        return setmealMapper.list(setmeal);
+    }
+
+    /**
+     * 根据id查询菜品选项
+     *
+     * @param id
+     * @return
+     */
+    public List<DishItemVO> getDishItemById(Long id) {
+        return setmealMapper.getDishItemBySetmealId(id);
     }
 }
