@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.xiaoymin.knife4j.core.util.CollectionUtils;
+import com.sky.config.RabbitMQConfig;
 import com.sky.constant.MessageConstant;
 import com.sky.context.BaseContext;
 import com.sky.dto.*;
@@ -22,6 +23,7 @@ import com.sky.vo.OrderSubmitVO;
 import com.sky.vo.OrderVO;
 import com.sky.websocket.WebSocketServer;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -52,6 +54,8 @@ public class OrderServiceImpl implements OrderService {
     private UserMapper userMapper;
     @Autowired
     private WebSocketServer webSocketServer;
+    @Autowired
+    private AmqpTemplate rabbitTemplate;
 
     // 设置订单的全局变量以跳过支付
     private Orders orders;
@@ -109,6 +113,14 @@ public class OrderServiceImpl implements OrderService {
 
         // 清空购物车
         shoppingCartMapper.deleteByUserId(userId);
+
+        // 订单创建时发送超时消息
+        rabbitTemplate.convertAndSend(RabbitMQConfig.DELAYED_EXCHANGE, RabbitMQConfig.ROUTING_KEY,
+                orders.getId(), message1 -> {
+                    // 设置超时时间，单位为ms
+                    message1.getMessageProperties().setDelay(900000);
+                    return message1;
+                });
 
         // 封装VO，返回结果
         OrderSubmitVO orderSubmitVO = OrderSubmitVO.builder()
